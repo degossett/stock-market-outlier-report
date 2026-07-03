@@ -1,0 +1,17 @@
+# Environment Variables & API Clients
+python-dotenv
+openai
+google-genai
+upstash-redis
+
+# Data Parsing
+beautifulsoup4
+lxml
+
+# Quantitative Data & Market Calendars
+yfinance
+pandas
+pandas_market_calendars
+
+# Chart Visualization
+matplotlib
