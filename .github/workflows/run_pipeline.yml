@@ -38,7 +38,7 @@ jobs:
           ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-        run: python 00_execute_pipeline.py
+        run: python -u 00_execute_pipeline.py
 
       # 6. EMAIL THE RESULTS
       - name: Send HTML Newsletter
