@@ -9,7 +9,7 @@ from upstash_redis import Redis
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-INPUT_JSON = os.path.join(BASE_DIR, "deep_research_analysis.json")
+INPUT_JSON = os.path.join(BASE_DIR, "deepseek_material_movers.json")
 TAXONOMY_JSON = os.path.join(BASE_DIR, "master_taxonomy_hierarchical.json") 
 OUTPUT_JSON = os.path.join(BASE_DIR, "glm_newsletter_finalists.json")
 
