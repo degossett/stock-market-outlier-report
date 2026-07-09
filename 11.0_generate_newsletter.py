@@ -2,8 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 
-# --- CONFIGURATION ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# --- CONFIGURATION ---\nBASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_JSON = os.path.join(BASE_DIR, "glm_newsletter_finalists.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "daily_anomaly_newsletter.html")
 
@@ -24,109 +23,269 @@ def generate_html_report():
     
     report_date = yesterday.strftime("%A, %B %d, %Y")
 
-    # --- HTML TEMPLATE ---
-    html_content = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Daily Market Anomalies</title>
-        <style>
-            body {{ font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333333; }}
-            .container {{ max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }}
-            .header {{ background-color: #0f172a; color: #ffffff; padding: 30px 40px; text-align: center; }}
-            .header h1 {{ margin: 0; font-size: 28px; letter-spacing: 1px; }}
-            .header p {{ margin: 10px 0 0 0; font-size: 14px; color: #94a3b8; }}
-            .macro-section {{ background-color: #f8fafc; padding: 30px 40px; border-bottom: 1px solid #e2e8f0; }}
-            .macro-section h2 {{ margin-top: 0; color: #0f172a; font-size: 20px; }}
-            .macro-section p {{ line-height: 1.6; color: #475569; margin-bottom: 0; }}
-            .anomalies-section {{ padding: 20px 40px; }}
-            .anomaly-card {{ padding: 25px 0; border-bottom: 1px solid #e2e8f0; }}
-            .anomaly-card:last-child {{ border-bottom: none; }}
-            .ticker-header {{ display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px; }}
-            .ticker-badge {{ background-color: #2563eb; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 16px; }}
-            .company-name {{ font-size: 20px; font-weight: 600; color: #0f172a; margin: 0; flex-grow: 1; }}
-            .action-buttons {{ display: flex; gap: 8px; }}
-            .action-btn {{ text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; transition: background-color 0.2s; }}
-            .chart-btn {{ background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }}
-            .chart-btn:hover {{ background-color: #e2e8f0; color: #0f172a; }}
-            .news-btn {{ background-color: #e0e7ff; color: #1d4ed8; border: 1px solid #bfdbfe; }}
-            .news-btn:hover {{ background-color: #dbeafe; color: #1e40af; }}
-            .frequent-flyer {{ background-color: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #fecaca; }}
-            .metadata {{ font-size: 13px; color: #64748b; margin-bottom: 15px; font-weight: 500; display: flex; gap: 10px; align-items: center; }}
-            .analysis-text {{ line-height: 1.6; color: #334155; font-size: 15px; }}
-            .rationale-box {{ margin-top: 15px; padding: 12px 15px; background-color: #f1f5f9; border-left: 4px solid #94a3b8; font-size: 13px; color: #475569; font-style: italic; }}
-            .footer {{ text-align: center; padding: 20px; font-size: 12px; color: #94a3b8; background-color: #f8fafc; border-top: 1px solid #e2e8f0; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>QUANTITATIVE ANOMALY REPORT</h1>
-                <p>{report_date}</p>
-            </div>
-            <div class="macro-section">
-                <h2>Macroeconomic Overview</h2>
-                <p>{macro_narrative}</p>
-            </div>
-            <div class="anomalies-section">
-    """
+    # --- HTML TEMPLATE (GDELT Mobile-First Specification) ---
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantitative Anomaly Report</title>
+    <style>
+        /* Mobile-First Base Settings */
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+        }}
+        
+        .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-sizing: border-box;
+        }}
+
+        /* Header Styling */
+        .header {{
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 24px 16px;
+            text-align: left;
+        }}
+        .header h1 {{
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.5px;
+            color: #f8fafc;
+        }}
+        .header .date {{
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+        }}
+
+        /* Section Containers */
+        .section-title {{
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+            padding: 16px 16px 8px 16px;
+            margin: 0;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }}
+
+        .macro-box {{
+            padding: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #334155;
+            border-bottom: 8px solid #f1f5f9;
+        }}
+
+        /* Anomaly Cards */
+        .anomaly-card {{
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }}
+        .anomaly-card:last-child {{
+            border-bottom: none;
+        }}
+
+        /* Card Header Row */
+        .card-header {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }}
+        .ticker-zone {{
+            display: flex;
+            flex-direction: column;
+        }}
+        .ticker {{
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }}
+        .company-name {{
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }}
+
+        /* Button Layouts (Stack natively on tiny screens) */
+        .action-buttons {{
+            display: flex;
+            gap: 6px;
+        }}
+        .action-btn {{
+            display: inline-block;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+        }}
+        .chart-btn {{
+            background-color: #2563eb;
+            color: #ffffff;
+        }}
+        .news-btn {{
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }}
+
+        /* Metadata Tags */
+        .metadata {{
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }}
+        .badge-sector {{
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #64748b;
+        }}
+        .badge-flyer {{
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }}
+
+        /* Content Text */
+        .analysis-text {{
+            font-size: 14.5px;
+            line-height: 1.55;
+            color: #334155;
+            margin-bottom: 12px;
+        }}
+
+        .rationale-box {{
+            background-color: #f8fafc;
+            border-left: 3px solid #cbd5e1;
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #475569;
+        }}
+
+        /* Footer */
+        .footer {{
+            background-color: #0f172a;
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+            padding: 20px 16px;
+            border-top: 1px solid #e2e8f0;
+        }}
+
+        /* Precision Mobile Adjustments */
+        @media only screen and (max-width: 480px) {{
+            .card-header {{
+                flex-direction: column;
+                gap: 10px;
+            }}
+            .action-buttons {{
+                width: 100%;
+            }}
+            .action-btn {{
+                flex: 1;
+                padding: 8px 4px;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quantitative Anomaly Report</h1>
+            <div class="date">{report_date}</div>
+        </div>
+
+        <div class="section-title">Macro Market Narrative</div>
+        <div class="macro-box">
+            {macro_narrative}
+        </div>
+
+        <div class="section-title">Idiosyncratic Anomalies Extracted</div>
+        <div class="anomalies-list">
+"""
 
     for item in anomalies:
         ticker = item.get("ticker", "UNKNOWN")
-        company = item.get("company_name", "Unknown Company")
-        sector = item.get("ishares_sector", "Unknown Sector")
-        subsector = item.get("deepseek_subsector", "Unknown Sub-Sector")
-        analysis = item.get("paragraph", "No analysis provided.")
-        rationale = item.get("deepseek_rationale", "")
-        count = item.get("appearance_count", 1)
-        
-        chart_url = f"https://finance.yahoo.com/quote/{ticker}/chart?range=5d"
-        news_url = f"https://finance.yahoo.com/quote/{ticker}/news/"
+        company = item.get("company_name", "")
+        sector = item.get("sector", "General")
+        subsector = item.get("subsector", "")
+        analysis = item.get("analysis", "")
+        rationale = item.get("rationale", "")
+        is_frequent_flyer = item.get("frequent_flyer", False)
 
-        # The Frequent Flyer Badge Logic
-        memory_badge = f'<span class="frequent-flyer">🔥 {count}x in 7 Days</span>' if count > 1 else ""
+        # Generate cleaner, standard finance external tracker URLs
+        chart_url = f"https://finance.yahoo.com/quote/{ticker}/chart"
+        news_url = f"https://finance.yahoo.com/quote/{ticker}/news"
+
+        memory_badge = '<span class="badge-flyer">⚠️ Frequent Flyer</span>' if is_frequent_flyer else ''
+        subsector_str = f" &bull; {subsector}" if subsector else ""
 
         html_content += f"""
-                <div class="anomaly-card">
-                    <div class="ticker-header">
-                        <span class="ticker-badge">{ticker}</span>
-                        <h3 class="company-name">{company}</h3>
-                        <div class="action-buttons">
-                            <a href="{chart_url}" target="_blank" class="action-btn chart-btn">View Chart</a>
-                            <a href="{news_url}" target="_blank" class="action-btn news-btn">Stock News</a>
-                        </div>
+            <div class="anomaly-card">
+                <div class="card-header">
+                    <div class="ticker-zone">
+                        <span class="ticker">{ticker}</span>
+                        <span class="company-name">{company}</span>
                     </div>
-                    <div class="metadata">
-                        <span>{sector} &bull; {subsector}</span>
-                        {memory_badge}
+                    <div class="action-buttons">
+                        <a href="{chart_url}" target="_blank" class="action-btn chart-btn">Chart</a>
+                        <a href="{news_url}" target="_blank" class="action-btn news-btn">News</a>
                     </div>
-                    <div class="analysis-text">
-                        {analysis}
-                    </div>
+                </div>
+                <div class="metadata">
+                    <span class="badge-sector">{sector}{subsector_str}</span>
+                    {memory_badge}
+                </div>
+                <div class="analysis-text">
+                    {analysis}
+                </div>
         """
         
         if rationale and rationale != "Unknown":
             html_content += f"""
-                    <div class="rationale-box">
-                        <strong>Company Profile:</strong> {rationale}
-                    </div>
+                <div class="rationale-box">
+                    <strong>Context:</strong> {rationale}
+                </div>
             """
             
         html_content += """
-                </div>
+            </div>
         """
 
     html_content += f"""
-            </div>
-            <div class="footer">
-                Automated Extraction Pipeline &bull; {len(anomalies)} Material Anomalies Detected
-            </div>
         </div>
-    </body>
-    </html>
-    """
+        <div class="footer">
+            Automated Extraction Pipeline &bull; {len(anomalies)} Material Anomalies Isolated
+        </div>
+    </div>
+</body>
+</html>
+"""
 
     with open(OUTPUT_HTML, 'w', encoding='utf-8') as f:
         f.write(html_content)
