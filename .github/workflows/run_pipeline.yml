@@ -3,11 +3,13 @@ name: Quantitative Anomaly Pipeline
 # 1. THE SCHEDULE
 on:
   schedule:
-    # Runs at 07:15 UTC (1:15 AM MDT / 12:15 AM MST), Tuesday through Saturday
-    - cron: '15 7 * * 2-6'
+    # RUN 1: Sundays at 13:00 UTC (7:00 AM MDT)
+    - cron: '0 13 * * 0'
+    
+    # RUN 2: Tue-Sat at 08:00 UTC (2:00 AM MDT)
+    - cron: '0 8 * * 2-6'
   
-  # Allows you to click a "Run workflow" button to test it manually
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   execute-pipeline:
