@@ -37,10 +37,45 @@ def get_todays_route():
         sys.exit(0)
     else:
         print("📈 Weekday detected. Routing to Daily Anomaly Processing.")
-        # Note: Your holiday guardrail inside Script 06 will handle actual market holidays!
         return DAILY_SCRIPTS
 
-# ... (Keep your existing run_script() and main() functions, just pass it the correct list!)
+def run_script(script_name):
+    """Executes a single python script and monitors its output in real time."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    script_path = os.path.join(base_dir, script_name)
+    
+    if not os.path.exists(script_path):
+        print(f"\n❌ [FATAL ERROR] Script missing from directory: {script_name}")
+        return False, 0.0
+
+    print("\n" + "="*80)
+    print(f"🚀 RUNNING STEP: {script_name}")
+    print(f"⏰ Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*80 + "\n")
+    
+    start_time = time.time()
+    
+    process = subprocess.Popen(
+        [sys.executable, script_path],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1
+    )
+    
+    # Stream the output directly to the terminal in real time
+    for line in process.stdout:
+        print(line, end="")
+        
+    process.wait()
+    duration = time.time() - start_time
+    
+    if process.returncode == 0:
+        print(f"\n✅ Step {script_name} completed successfully in {duration:.2f} seconds.")
+        return True, duration
+    else:
+        print(f"\n❌ Step {script_name} CRASHED with exit code {process.returncode}.")
+        return False, duration
 
 def main():
     # Get the correct list of scripts for today
@@ -51,4 +86,32 @@ def main():
     
     print("\n" + "="*80)
     print(f"🏭 KICKING OFF QUANTITATIVE ANOMALY EXTRACTION PIPELINE")
-    # ... runs through scripts_to_run instead of PIPELINE_SCRIPTS
+    print(f"Session Triggered: {datetime.now().strftime('%A, %B %d, %Y %H:%M:%S')}")
+    print("="*80)
+    
+    for script in scripts_to_run:
+        success, duration = run_script(script)
+        performance_log.append((script, success, duration))
+        
+        if not success:
+            print("\n" + "!"*80)
+            print(f"🚨 PIPELINE EXECUTION HALTED AT: {script}")
+            print("Downstream dependencies protectively bypassed. Fix errors before resuming.")
+            print("!"*80 + "\n")
+            sys.exit(1)
+            
+    total_duration = time.time() - pipeline_start
+    
+    # --- FINAL PERFORMANCE REPORT ---
+    print("\n" + "="*80)
+    print("📊 PIPELINE EXECUTION PERFORMANCE SUMMARY")
+    print("="*80)
+    for script, success, duration in performance_log:
+        status = "🟢 SUCCESS" if success else "🔴 FAILED "
+        print(f"  {status} | {duration:7.2f}s | {script}")
+    print("-"*80)
+    print(f"Total Combined Pipeline Runtime: {total_duration/60:.2f} minutes")
+    print("="*80 + "\n")
+
+if __name__ == "__main__":
+    main()
