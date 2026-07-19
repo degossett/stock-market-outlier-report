@@ -14,12 +14,18 @@ SUNDAY_SCRIPTS = [
 ]
 
 DAILY_SCRIPTS = [     
+    DAILY_SCRIPTS = [
+    "01.0_parse_ishares.py",                 
+    "02.0_enrich_with_yahoo.py",              
+    "03.0_deepseek_taxonomy.py",              
+    "04.0_combine_metadata.py",              
+    "05.0_gemini_sector.py",
     "06.0_pull_price_data.py",           
     "07.0_generate_individual_charts.py",         
     "08.0_field_reporter.py",                 
     "09.0_materiality_filter.py",                     
     "10.0_editor_in_chief.py",                
-    "11.0_generate_newsletter.py"             
+    "11.0_generate_newsletter.py"                       
 ]
 
 def get_todays_route():
