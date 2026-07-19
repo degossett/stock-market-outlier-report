@@ -2,7 +2,8 @@ import os
 import json
 from datetime import datetime, timedelta
 
-# --- CONFIGURATION ---\nBASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# --- CONFIGURATION ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 INPUT_JSON = os.path.join(BASE_DIR, "glm_newsletter_finalists.json")
 OUTPUT_HTML = os.path.join(BASE_DIR, "daily_anomaly_newsletter.html")
 
